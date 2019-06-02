@@ -118,7 +118,7 @@ function status.version(){
 }
 
 function sip.trunk.down(){
-    TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "sip show peers" | grep UNREACHABLE | awk '{print$1}'| grep [A-Za-z]`
+    TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep UNREACHABLE | awk '{print$1}'| grep [A-Za-z]`
     if [ -n "$TRUNK" ]; then
     	echo $TRUNK
     else
@@ -129,13 +129,13 @@ function sip.trunk.down(){
 
 
 function sip.peers(){
-    TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "sip show peers" | grep UNREACHABLE | awk '{print$1}'| grep [A-Za-z]`
+    TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep UNREACHABLE | awk '{print$1}'| grep [A-Za-z]`
     if [ -n "$TRUNK" ]; then
-    	sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_sip.so" >> /dev/null
-        sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_pjsip.so" >> /dev/null
-        sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_sip.so"  >> /dev/null
-        sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_pjsip.so"  >> /dev/null
-        sleep 1
+   # 	sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_sip.so" >> /dev/null
+   #     sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_pjsip.so" >> /dev/null
+   #     sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_sip.so"  >> /dev/null
+   #     sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_pjsip.so"  >> /dev/null
+   #     sleep 1
         echo $TRUNK
     else
         echo "1"
@@ -143,7 +143,7 @@ function sip.peers(){
 }
 
 function sip.register.time(){
-    MS=$(sudo -u asterisk /usr/sbin/asterisk -rx "sip show peers" | grep OK | grep -oP '\(\K[^\)]+' | sed 's/ms//g' | sort -n | awk '$1>199')
+    MS=$(sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep OK | grep -oP '\(\K[^\)]+' | sed 's/ms//g' | sort -n | awk '$1>199')
     LOG=$(for i in $(sudo -u asterisk /usr/sbin/asterisk -rx "sip show peers" | grep OK | grep -oP '\(\K[^\)]+' | sed 's/ms//g' | sort -n | awk '$1>199'); do sudo -u asterisk /usr/sbin/asterisk -rx "sip show peers" | grep OK | grep $i; done)
     DATE=$(date +"%Y-%m-%d %H:%M:%S")
 
