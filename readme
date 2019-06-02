@@ -16,3 +16,5 @@ UserParameter=iax.trunk.down,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.s
 UserParameter=sip.register.time,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.sh sip.register.time
 UserParameter=sip.trunk.down,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.sh sip.trunk.down
 UserParameter=wrong.password,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.sh wrong.password
+
+Put zabbix.sh in zabbix_agentd.conf.d
