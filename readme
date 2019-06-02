@@ -18,3 +18,6 @@ UserParameter=sip.trunk.down,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.s
 UserParameter=wrong.password,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.sh wrong.password
 
 Put asterisk.sh in zabbix_agentd.conf.d and create correct permissions (chmod +x)
+
+### Zabbix Setup
+echo '%zabbix ALL=(asterisk) NOPASSWD:/usr/sbin/asterisk' >> /etc/sudoers
