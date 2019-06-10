@@ -15,6 +15,7 @@ UserParameter=iax.register.time,/etc/zabbix/zabbix_agentd.conf.d/scripts/asteris
 UserParameter=iax.trunk.down,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.sh iax.trunk.down
 UserParameter=sip.register.time,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.sh sip.register.time
 UserParameter=sip.trunk.down,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.sh sip.trunk.down
+UserParameter=sip.peers,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.sh sip.peers
 UserParameter=wrong.password,/etc/zabbix/zabbix_agentd.conf.d/scripts/asterisk.sh wrong.password
 
 Put asterisk.sh in zabbix_agentd.conf.d and create correct permissions (chmod +x)
