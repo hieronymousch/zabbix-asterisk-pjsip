@@ -1,6 +1,7 @@
 #!/bin/bash
 ## Asterisk Zabbix Check Script
 ## Dave Conroy <dave at tiredofit dot ca> 2018-04-07
+## Modified by hieronymousch for FreePBX Sangoma 
 
 if [ ! -n "$1" ]; then
     echo "I'm ready for an argument!"
@@ -8,7 +9,7 @@ if [ ! -n "$1" ]; then
 fi
 
 function calls.active(){
-    CALL=`sudo -u asterisk /usr/sbin/asterisk -rx "core show channels" |grep "active calls"|awk '{print$1}'`
+    CALL=`sudo -u asterisk /usr/sbin/asterisk -rx "core show channels" |grep "active call"|awk '{print$1}'`
     echo "$CALL"
 }
 
@@ -24,16 +25,16 @@ function calls.longest(){
     CHANNEL_TIME=${CHANNEL_TIME:-"0"}
 
     if [ "$CHANNEL_TIME" -gt 7200 ]; then
-    	asterisk -rx "channel request hangup $CHANNEL_NAME" >> /var/log/asterisk/full
+        asterisk -rx "channel request hangup $CHANNEL_NAME" >> /var/log/asterisk/full
         sleep 1
 
         if [ "`asterisk -rx 'core show channels concise' | grep $CHANNEL_NAME`" ]; then
             echo "$CHANNEL_NAME is $CHANNEL_TIME long"
         else
-	    echo 1
+            echo 1
         fi
     else
-    	echo 1
+        echo 1
     fi
 }
 
@@ -45,7 +46,7 @@ function channels.active(){
 function iax.peers(){
     TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "iax2 show peers" | grep UNREACHABLE | awk '{print$1}'| grep [A-Za-z]`
     if [ -n "$TRUNK" ]; then
-    	sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_iax2.so" >> /dev/null
+        sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_iax2.so" >> /dev/null
         sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_iax2.so"  >> /dev/null
         sleep 1
         echo $TRUNK
@@ -71,14 +72,14 @@ function iax.register.time(){
 function iax.trunk.down(){
     TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "iax2 show peers" | grep UNREACHABLE | awk '{print$1}' | grep [A-Za-z]`
     if [ -n "$TRUNK" ]; then
-    	echo $TRUNK
+        echo $TRUNK
     else
         echo "1"
     fi
 }
 
 function status(){
-    proc_status=`ps -AF | grep 'sudo -u asterisk /usr/sbin/asterisk'`
+    proc_status='pidof asterisk'
     if [ -n "$proc_status" ]; then
         echo "1"
     else
@@ -120,7 +121,7 @@ function status.version(){
 function sip.trunk.down(){
     TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep UNREACHABLE | awk '{print$1}'| grep [A-Za-z]`
     if [ -n "$TRUNK" ]; then
-    	echo $TRUNK
+        echo $TRUNK
     else
         echo "1"
     fi
@@ -129,13 +130,13 @@ function sip.trunk.down(){
 
 
 function sip.peers(){
-    TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep UNREACHABLE | awk '{print$1}'| grep [A-Za-z]`
+    TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep Unavailable | awk '{print$1}'| grep [A-Za-z]`
     if [ -n "$TRUNK" ]; then
-   # 	sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_sip.so" >> /dev/null
-   #     sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_pjsip.so" >> /dev/null
-   #     sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_sip.so"  >> /dev/null
-   #     sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_pjsip.so"  >> /dev/null
-   #     sleep 1
+#       sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_sip.so" >> /dev/null
+#        sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_pjsip.so" >> /dev/null
+#        sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_sip.so"  >> /dev/null
+#        sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_pjsip.so"  >> /dev/null
+#        sleep 1
         echo $TRUNK
     else
         echo "1"
@@ -143,8 +144,8 @@ function sip.peers(){
 }
 
 function sip.register.time(){
-    MS=$(sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep OK | grep -oP '\(\K[^\)]+' | sed 's/ms//g' | sort -n | awk '$1>199')
-    LOG=$(for i in $(sudo -u asterisk /usr/sbin/asterisk -rx "sip show peers" | grep OK | grep -oP '\(\K[^\)]+' | sed 's/ms//g' | sort -n | awk '$1>199'); do sudo -u asterisk /usr/sbin/asterisk -rx "sip show peers" | grep OK | grep $i; done)
+    MS=$(sudo -u asterisk /usr/sbin/asterisk -rx "sip show peers" | grep Avail | grep -oP '\(\K[^\)]+' | sed 's/ms//g' | sort -n | awk '$1>199')
+    LOG=$(for i in $(sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep Avail | grep -oP '\(\K[^\)]+' | sed 's/ms//g' | sort -n | awk '$1>199'); do sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep Avail | grep $i; done)
     DATE=$(date +"%Y-%m-%d %H:%M:%S")
 
     if [[ -n "$MS" ]]; then
