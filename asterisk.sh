@@ -130,17 +130,9 @@ function sip.trunk.down(){
 
 
 function sip.peers(){
-    TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep Unavailable | awk '{print$1}'| grep [A-Za-z]`
-    if [ -n "$TRUNK" ]; then
-#       sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_sip.so" >> /dev/null
-#        sudo -u asterisk /usr/sbin/asterisk -rx "module unload chan_pjsip.so" >> /dev/null
-#        sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_sip.so"  >> /dev/null
-#        sudo -u asterisk /usr/sbin/asterisk -rx "module load chan_pjsip.so"  >> /dev/null
-#        sleep 1
-        echo $TRUNK
-    else
-        echo "1"
-    fi
+    TRUNK=`sudo -u asterisk /usr/sbin/asterisk -rx "pjsip show endpoints" | grep Contact | wc -l`
+    echo $TRUNK
+   
 }
 
 function sip.register.time(){
